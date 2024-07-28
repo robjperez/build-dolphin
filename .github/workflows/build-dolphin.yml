@@ -32,15 +32,18 @@ jobs:
           if [ "${{ github.event.inputs.commit_hash }}" != "latest" ]; then
             git checkout ${{ github.event.inputs.commit_hash }}
           fi
+          git -c submodule."Externals/Qt".update=none -c submodule."Externals/FFmpeg-bin".update=none -c submodule."Externals/libadrenotools".update=none submodule update --init --recursive && git pull --recurse-submodules
           git submodule update --init --recursive
           
-      - name: Build Dolphin Emulator
+      - name: Build Dolphin Emulator (Portable Build)
         run: |
           cd dolphin
           mkdir build
           cd build
-          cmake ..
-          make -j$(nproc)
+          cmake .. -DLINUX_LOCAL_DEV=true
+          cd .. && make -j$(nproc)
+          cp -r ../Data/Sys/ Binaries/
+          touch Binaries/portable.txt
 
       - name: Archive Build
         run: |
