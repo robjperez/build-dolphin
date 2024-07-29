@@ -31,7 +31,7 @@ jobs:
         run: |
           git clone https://github.com/flathub/org.DolphinEmu.dolphin-emu.git
           cd org.DolphinEmu.dolphin-emu          
-          ../update-version-and-name.py ${{ github.events.inputs.commit_hash }}
+          ../update-version-and-name.py ${{ inputs.commit_hash || '53d2311163ae3deee54f6088d3dc257e495b4bf5' }}
           
       - name: Build flatpak
         run: |
