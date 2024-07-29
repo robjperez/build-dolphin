@@ -23,8 +23,8 @@ jobs:
         run: |
           sudo apt update
           sudo apt install build-essential flatpak flatpak-builder git
-          sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-          sudo flatpak install -y org.kde.Sdk/x86_64/6.7
+          flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+          flatpak install -y --user org.kde.Sdk/x86_64/6.7
 
       - name: Clone Dolphin Emulator flatpak and update data
         run: |
@@ -35,8 +35,8 @@ jobs:
       - name: Build flatpak
         run: |
           cd org.DolphinEmu.dolphin-emu
-          sudo flatpak list
-          sudo flatpak-builder --user --install --force-clean --install-deps-from=flathub --repo=repo build-dir org.DolphinEmu.dolphin-emu.yml 
+          flatpak list --user
+          flatpak-builder --user --install --force-clean --repo=repo build-dir org.DolphinEmu.dolphin-emu.yml 
           
       - name: Bundle flatpak
         run: |
