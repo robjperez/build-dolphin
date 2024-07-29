@@ -9,7 +9,7 @@ on:
       commit_hash:
         description: 'Commit hash of the Dolphin repository'
         required: false
-        default: 'latest'
+        default: '53d2311163ae3deee54f6088d3dc257e495b4bf5'
 
 jobs:
   build:
@@ -30,8 +30,8 @@ jobs:
       - name: Clone Dolphin Emulator flatpak and update data
         run: |
           git clone https://github.com/flathub/org.DolphinEmu.dolphin-emu.git
-          cd org.DolphinEmu.dolphin-emu
-          sed -i "s/^app\-id\: org\.DolphinEmu.*$/app\-id\: org\.DolphinEmu\.dolphin\-emu\-latest/g" org.DolphinEmu.dolphin-emu.yml 
+          cd org.DolphinEmu.dolphin-emu          
+          ../update-version-and-name.py $commit_hash
           
       - name: Build flatpak
         run: |
