@@ -39,12 +39,12 @@ jobs:
       - name: Build flatpak
         run: |
           cd org.DolphinEmu.dolphin-emu
-          flatpak-builder --user --install --force-clean --repo=repo build-dir org.DolphinEmu.dolphin-emu.yml 
+          sudo flatpak-builder --user --install --force-clean --repo=repo build-dir org.DolphinEmu.dolphin-emu.yml 
           
       - name: Bundle flatpak
         run: |
           cd org.DolphinEmu.dolphin-emu
-          flatpak build-bundle repo dolphin-emu-latest.flatpak org.DolphinEmu.dolphin-emu-latest
+          sudo flatpak build-bundle repo dolphin-emu-latest.flatpak org.DolphinEmu.dolphin-emu-latest
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v3
