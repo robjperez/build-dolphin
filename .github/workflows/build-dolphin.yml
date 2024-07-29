@@ -22,41 +22,33 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt update
-          sudo apt install build-essential git cmake ffmpeg libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libevdev-dev libusb-1.0-0-dev libxrandr-dev libxi-dev libpangocairo-1.0-0 qt6-base-private-dev libqt6svg6-dev libbluetooth-dev libasound2-dev libpulse-dev libgl1-mesa-dev libcurl4-openssl-dev
-          sudo apt install libudev-dev libsystemd-dev || sudo apt install libeudev-dev
+          sudo apt install build-essential flatpak flatpak-builder git
 
-      - name: Clone Dolphin Emulator
+      - name: Clone Dolphin Emulator flatpak
         run: |
-          git clone https://github.com/dolphin-emu/dolphin.git
-          cd dolphin
-          if [ "${{ github.event.inputs.commit_hash }}" != "latest" ]; then
-            git checkout ${{ github.event.inputs.commit_hash }}
-          fi
-          git -c submodule."Externals/Qt".update=none -c submodule."Externals/FFmpeg-bin".update=none -c submodule."Externals/libadrenotools".update=none submodule update --init --recursive && git pull --recurse-submodules
-          git submodule update --init --recursive
+          git clone https://github.com/flathub/org.DolphinEmu.dolphin-emu.git
+          cd org.DolphinEmu.dolphin-emu
+                    
+      - name: Update dolphin emu commit and change app-id
+        run: |
+          cd org.DolphinEmu.dolphin-emu
+          sed -i "s/^app\-id\: org\.DolphinEmu.*$/app\-id\: org\.DolphinEmu\.dolphin\-emu\-latest/g" org.DolphinEmu.dolphin-emu.yml 
+      
+      - name: Build flatpak
+        run: |
+          cd org.DolphinEmu.dolphin-emu
+          flatpak-builder --user --install --force-clean --repo=repo build-dir org.DolphinEmu.dolphin-emu.yml 
           
-      - name: Build Dolphin Emulator (Portable Build)
+      - name: Bundle flatpak
         run: |
-          cd dolphin
-          mkdir build
-          cd build
-          cmake .. -DLINUX_LOCAL_DEV=true
-          make -j$(nproc)
-          ls -la .
-          ls -la ..
-          cp -r ../Data/Sys/ Binaries/
-          touch Binaries/portable.txt
-
-      - name: Archive Build
-        run: |
-          cd dolphin/build
-          tar -czvf dolphin-emu.tar.gz *
+          cd org.DolphinEmu.dolphin-emu
+          flatpak build-bundle repo dolphin-emu-latest.flatpak org.DolphinEmu.dolphin-emu-latest
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v3
         with:
-          name: dolphin-emu
-          path: dolphin/build/dolphin-emu.tar.gz
+          name: dolphin-emu-latest.flatpak
+          path: org.DolphinEmu.dolphin-emu/dolphin-emu-latest.flatpak
 
       - name: Create GitHub Release
         id: create_release
@@ -75,6 +67,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: dolphin/build/dolphin-emu.tar.gz
-          asset_name: dolphin-emu.tar.gz
+          asset_path: org.DolphinEmu.dolphin-emu/dolphin-emu-latest.flatpak
+          asset_name: dolphin-emu-latest.flatpak
           asset_content_type: application/gzip
