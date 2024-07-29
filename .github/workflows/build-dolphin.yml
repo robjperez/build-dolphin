@@ -23,6 +23,7 @@ jobs:
         run: |
           sudo apt update
           sudo apt install build-essential flatpak flatpak-builder git
+          flatpak install org.kde.Sdk/x86_64/6.7
 
       - name: Clone Dolphin Emulator flatpak
         run: |
